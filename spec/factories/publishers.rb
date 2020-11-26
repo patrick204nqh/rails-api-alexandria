@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :publisher do
-    name { "Patrick Test" }
+    name { "O'Reilly" }
   end
 end
