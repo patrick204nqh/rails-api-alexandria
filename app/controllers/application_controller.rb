@@ -1,8 +1,31 @@
 class ApplicationController < ActionController::API
 
   rescue_from QueryBuilderError, with: :query_builder_error
+  rescue_from RepresentationBuilderError, with: :builder_error
 
   protected
+
+  def builder_error(error)
+    render status: 400, json: {
+      error: {
+        type: error.class,
+        message: error.message,
+        invalid_params: error.invalid_params
+      }
+    }
+  end
+
+  def eager_load(scope)
+    EagerLoader.new(scope, params).load
+  end
+
+  def orchestrate_query(scope, actions = :all)
+    QueryOrchestrator.new(scope: scope,
+                          params: params,
+                          request: request,
+                          response: response,
+                          actions: actions).run
+  end
 
   def query_builder_error(error)
     render status: 400, json: {
